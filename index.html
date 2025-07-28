@@ -1,12 +1,90 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Document</title>
-    <link rel="stylesheet" href="style/styles.css">
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>BMI Calculator</title>
+  <link rel="stylesheet" href="style/styles.css" />
 </head>
 <body>
-    
+  <div class="background-animation"></div>
+
+  <div class="container">
+    <h1>BMI Calculator</h1>
+
+    <div class="unit-toggle">
+      <label><input type="radio" name="unit" value="metric" checked /> Metric</label>
+      <label><input type="radio" name="unit" value="imperial" /> Imperial</label>
+    </div>
+
+    <div id="metric-inputs" class="inputs">
+      <input type="number" id="weightMetric" placeholder="Weight (kg)" />
+      <input type="number" id="heightMetric" placeholder="Height (cm)" />
+    </div>
+
+    <div id="imperial-inputs" class="inputs hidden">
+      <input type="number" id="weightImperial" placeholder="Weight (lbs)" />
+      <input type="number" id="heightFeet" placeholder="Height (feet)" />
+      <input type="number" id="heightInches" placeholder="Height (inches)" />
+    </div>
+
+    <button onclick="calculateBMI()">Calculate BMI</button>
+
+    <div id="result" class="result"></div>
+  </div>
+
+  <script>
+    const unitRadios = document.getElementsByName('unit');
+    const metricInputs = document.getElementById('metric-inputs');
+    const imperialInputs = document.getElementById('imperial-inputs');
+
+    unitRadios.forEach(radio => {
+      radio.addEventListener('change', () => {
+        if (radio.value === 'metric') {
+          metricInputs.classList.remove('hidden');
+          imperialInputs.classList.add('hidden');
+        } else {
+          metricInputs.classList.add('hidden');
+          imperialInputs.classList.remove('hidden');
+        }
+      });
+    });
+
+    function calculateBMI() {
+      const selectedUnit = document.querySelector('input[name="unit"]:checked').value;
+      let bmi;
+
+      if (selectedUnit === 'metric') {
+        const weight = parseFloat(document.getElementById('weightMetric').value);
+        const height = parseFloat(document.getElementById('heightMetric').value);
+        if (weight > 0 && height > 0) {
+          const heightInMeters = height / 100;
+          bmi = weight / (heightInMeters ** 2);
+        }
+      } else {
+        const weight = parseFloat(document.getElementById('weightImperial').value);
+        const feet = parseFloat(document.getElementById('heightFeet').value);
+        const inches = parseFloat(document.getElementById('heightInches').value);
+        if (weight > 0 && (feet >= 0 || inches >= 0)) {
+          const totalInches = (feet * 12) + inches;
+          bmi = (weight / (totalInches ** 2)) * 703;
+        }
+      }
+
+      const result = document.getElementById('result');
+      if (!bmi || isNaN(bmi)) {
+        result.innerHTML = '<p class="error">Please enter valid values.</p>';
+        return;
+      }
+
+      let category = '';
+      if (bmi < 18.5) category = 'Underweight';
+      else if (bmi < 24.9) category = 'Normal weight';
+      else if (bmi < 29.9) category = 'Overweight';
+      else category = 'Obese';
+
+      result.innerHTML = `<p>Your BMI is <strong>${bmi.toFixed(1)}</strong> (${category})</p>`;
+    }
+  </script>
 </body>
 </html>
